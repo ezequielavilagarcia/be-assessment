@@ -1,6 +1,7 @@
 const axios = require('axios');
 const { CLIENTS_URL } = require('../utils/url.constants.js');
 const { INTERNAL_ERROR_CODE } = require('../utils/api.constants.js');
+const { toLowerCase } = require('../utils/string.helper');
 
 class Client {
   /**
@@ -40,7 +41,9 @@ class Client {
 
       for (const key in keyObject) {
         if (keyObject.hasOwnProperty(key)) {
-          founded = founded || client[key] === keyObject[key];
+          const firstValueToCompare = toLowerCase(client[key]);
+          const secondValueToCompare = toLowerCase(keyObject[key]);
+          founded = founded || firstValueToCompare === secondValueToCompare;
         }
       }
 
