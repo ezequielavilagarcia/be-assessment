@@ -94,6 +94,17 @@ describe('Get clients data filtered', () => {
         expect(response.body.client.id).equal(client.id);
         expect(response.body.client.name).equal(client.name);
       });
+      it('is succesful with case insensitive', async () => {
+        const client = clients[1];
+        const clientName = client.name.replace(client.name, 'DaNiEl');
+
+        const response = await chai.request(server).get('/clients/filter/' + clientName);
+
+        expect(response).to.have.status(SUCCESS_CODE);
+        expect(response.body.message).equal(CLIENT_FOUNDED_MESSAGE);
+        expect(response.body.client.id).equal(client.id);
+        expect(response.body.client.name).equal(client.name);
+      });
     });
 
     describe('client does not exists', () => {
@@ -199,6 +210,17 @@ describe('Get client policies', () => {
       expect(response.body.message).equal(POLICIES_NOT_FOUNDED_MESSAGE);
       expect(response.body.client.id).equal(client.id);
       expect(response.body.policies.length).equal(0);
+    });
+    it('is succesful with case insensitive', async () => {
+      const client = clients[0];
+      const clientName = client.name.replace(client.name, 'BrItNeY');
+
+      const response = await chai.request(server).get(`/clients/${clientName}/policies`);
+
+      expect(response).to.have.status(SUCCESS_CODE);
+      expect(response.body.message).equal(POLICIES_FOUNDED_MESSAGE);
+      expect(response.body.client.id).equal(client.id);
+      expect(response.body.policies.length).equal(3);
     });
   });
   it('Client does not exists', async () => {
