@@ -80,4 +80,33 @@ describe('Get clients data filtered', () => {
       it('tells user to authenticate');
     });
   });
+  describe('By client name', () => {
+    describe('client is finded', () => {
+      it('is succesful', async () => {
+        const client = clients[1];
+
+        const response = await chai.request(server).get('/clients/filter/' + client.name);
+
+        expect(response).to.have.status(200);
+        expect(response.body.message).equal(CLIENT_FOUNDED_MESSAGE);
+        expect(response.body.client.id).equal(client.id);
+        expect(response.body.client.name).equal(client.name);
+      });
+    });
+
+    describe('client is not finded', () => {
+      it('return not found code and not found message', async () => {
+        const clientName = 'Fake Name';
+        const response = await chai.request(server).get('/clients/filter/' + clientName);
+        expect(response).to.have.status(404);
+        expect(response.body).to.not.have.property('client');
+        expect(response.body.message).equal(CLIENT_NOT_FOUNDED_MESSAGE);
+      });
+    });
+
+    describe('user is not authenticated', () => {
+      it('is not succesful');
+      it('tells user to authenticate');
+    });
+  });
 });
