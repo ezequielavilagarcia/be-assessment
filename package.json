@@ -1,0 +1,32 @@
+{
+  "name": "insurance-policies-reports",
+  "version": "1.0.0",
+  "description": "Backend developer assesment: REST API using NodeJS & Express",
+  "main": "app.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "./node_modules/.bin/mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ezequielavilagarcia/be-assessment.git"
+  },
+  "author": "Ezequiel Avila Garcia",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ezequielavilagarcia/be-assessment/issues"
+  },
+  "homepage": "https://github.com/ezequielavilagarcia/be-assessment#readme",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "express": "^4.16.4"
+  },
+  "devDependencies": {
+    "axios-mock-adapter": "^1.16.0",
+    "chai": "^4.2.0",
+    "chai-http": "^4.2.1",
+    "mocha": "^5.2.0",
+    "nodemon": "^1.18.9"
+  }
+}

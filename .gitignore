@@ -1,0 +1,6 @@
+# dependencies
+/node_modules
+
+# package json
+package-lock.json
+Backend_developer_assessment_NODEJS.pdf

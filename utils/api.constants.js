@@ -1,0 +1,3 @@
+exports.SUCCESS_CODE = 200;
+exports.NOT_FOUND_CODE = 404;
+exports.INTERNAL_ERROR_CODE = 500;
