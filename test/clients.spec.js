@@ -81,7 +81,7 @@ describe('Get clients data filtered', () => {
     });
   });
   describe('By client name', () => {
-    describe('client is finded', () => {
+    describe('client exists', () => {
       it('is succesful', async () => {
         const client = clients[1];
 
@@ -94,7 +94,7 @@ describe('Get clients data filtered', () => {
       });
     });
 
-    describe('client is not finded', () => {
+    describe('client does not exists', () => {
       it('return not found code and not found message', async () => {
         const clientName = 'Fake Name';
         const response = await chai.request(server).get('/clients/filter/' + clientName);
