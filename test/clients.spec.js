@@ -87,7 +87,7 @@ describe('Get clients data filtered', () => {
 
         const response = await chai.request(server).get('/clients/filter/' + client.name);
 
-        expect(response).to.have.status(200);
+        expect(response).to.have.status(SUCCESS_CODE);
         expect(response.body.message).equal(CLIENT_FOUNDED_MESSAGE);
         expect(response.body.client.id).equal(client.id);
         expect(response.body.client.name).equal(client.name);
@@ -98,7 +98,7 @@ describe('Get clients data filtered', () => {
       it('return not found code and not found message', async () => {
         const clientName = 'Fake Name';
         const response = await chai.request(server).get('/clients/filter/' + clientName);
-        expect(response).to.have.status(404);
+        expect(response).to.have.status(NOT_FOUND_CODE);
         expect(response.body).to.not.have.property('client');
         expect(response.body.message).equal(CLIENT_NOT_FOUNDED_MESSAGE);
       });
