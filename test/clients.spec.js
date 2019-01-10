@@ -9,12 +9,12 @@ const { SUCCESS_CODE, NOT_FOUND_CODE } = require('../utils/api.constants');
 const {
   CLIENT_FOUNDED_MESSAGE,
   CLIENT_NOT_FOUNDED_MESSAGE,
-  POLICIES_FOUNDED_MESSAGE,
-  POLICIES_NOT_FOUNDED_MESSAGE
+  CLIENT_POLICIES_FOUNDED_MESSAGE,
+  CLIENT_POLICIES_NOT_FOUNDED_MESSAGE
 } = require('../utils/messages.constants');
 
 const expect = chai.expect;
-describe('Get clients data filtered', () => {
+describe('Get client data filtered', () => {
   let axiosMocked;
   let clients;
   before(() => {
@@ -123,7 +123,7 @@ describe('Get clients data filtered', () => {
     });
   });
 });
-describe('Get client policies', () => {
+describe('Get the list of policies linked to a client name', () => {
   let axiosMocked;
   let clients;
   before(() => {
@@ -197,7 +197,7 @@ describe('Get client policies', () => {
       const response = await chai.request(server).get(`/clients/${client.name}/policies`);
 
       expect(response).to.have.status(SUCCESS_CODE);
-      expect(response.body.message).equal(POLICIES_FOUNDED_MESSAGE);
+      expect(response.body.message).equal(CLIENT_POLICIES_FOUNDED_MESSAGE);
       expect(response.body.client.id).equal(client.id);
       expect(response.body.policies.length).equal(3);
     });
@@ -207,7 +207,7 @@ describe('Get client policies', () => {
       const response = await chai.request(server).get(`/clients/${client.name}/policies`);
 
       expect(response).to.have.status(NOT_FOUND_CODE);
-      expect(response.body.message).equal(POLICIES_NOT_FOUNDED_MESSAGE);
+      expect(response.body.message).equal(CLIENT_POLICIES_NOT_FOUNDED_MESSAGE);
       expect(response.body.client.id).equal(client.id);
       expect(response.body.policies.length).equal(0);
     });
@@ -218,7 +218,7 @@ describe('Get client policies', () => {
       const response = await chai.request(server).get(`/clients/${clientName}/policies`);
 
       expect(response).to.have.status(SUCCESS_CODE);
-      expect(response.body.message).equal(POLICIES_FOUNDED_MESSAGE);
+      expect(response.body.message).equal(CLIENT_POLICIES_FOUNDED_MESSAGE);
       expect(response.body.client.id).equal(client.id);
       expect(response.body.policies.length).equal(3);
     });

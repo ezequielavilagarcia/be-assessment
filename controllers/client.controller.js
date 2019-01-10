@@ -3,8 +3,8 @@ const { NOT_FOUND_CODE, SUCCESS_CODE, INTERNAL_ERROR_CODE } = require('../utils/
 const {
   CLIENT_FOUNDED_MESSAGE,
   CLIENT_NOT_FOUNDED_MESSAGE,
-  POLICIES_FOUNDED_MESSAGE,
-  POLICIES_NOT_FOUNDED_MESSAGE
+  CLIENT_POLICIES_FOUNDED_MESSAGE,
+  CLIENT_POLICIES_NOT_FOUNDED_MESSAGE
 } = require('../utils/messages.constants');
 
 exports.getClientById = async (req, res, next) => {
@@ -62,11 +62,11 @@ exports.getClientPolicies = async (req, res, next) => {
 
     const policies = await Policy.find({ clientId: client.id });
 
-    let message = POLICIES_FOUNDED_MESSAGE;
+    let message = CLIENT_POLICIES_FOUNDED_MESSAGE;
     let code = SUCCESS_CODE;
 
     if (policies.length === 0) {
-      message = POLICIES_NOT_FOUNDED_MESSAGE;
+      message = CLIENT_POLICIES_NOT_FOUNDED_MESSAGE;
       code = NOT_FOUND_CODE;
     }
 

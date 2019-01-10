@@ -1,5 +1,7 @@
 const axios = require('axios');
+
 const { POLICIES_URL } = require('../utils/url.constants.js');
+const { INTERNAL_ERROR_CODE } = require('../utils/api.constants.js');
 const { toLowerCase } = require('../utils/string.helper');
 
 class Policy {
@@ -17,7 +19,7 @@ class Policy {
       return policies;
     } catch (err) {
       const error = new Error('Could not get ' + POLICIES_URL + ' try again later');
-      error.statusCode = 500;
+      error.statusCode = INTERNAL_ERROR_CODE;
       throw error;
     }
   }
