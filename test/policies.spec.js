@@ -6,6 +6,7 @@ const MockAdapter = require('axios-mock-adapter');
 const server = require('../app');
 const { CLIENTS_URL, POLICIES_URL } = require('../utils/url.constants');
 const {
+  API_BASE_URL,
   SUCCESS_CODE,
   NOT_FOUND_CODE,
   UNAUTHORIZED_CODE,
@@ -86,7 +87,7 @@ describe('Get the client linked to a policy number', () => {
     const body = JSON.stringify({ email });
     const response = await chai
       .request(server)
-      .post('/auth/login')
+      .post(`${API_BASE_URL}/auth/login`)
       .set('Content-Type', 'application/json')
       .send(body);
 
@@ -104,7 +105,7 @@ describe('Get the client linked to a policy number', () => {
 
     const response = await chai
       .request(server)
-      .get(`/policies/${policy.id}/client`)
+      .get(`${API_BASE_URL}/policies/${policy.id}/client`)
       .set('Authorization', 'Bearer ' + token);
 
     expect(response.body.message).equal(CLIENT_FOUNDED_MESSAGE);
@@ -118,7 +119,7 @@ describe('Get the client linked to a policy number', () => {
 
     const response = await chai
       .request(server)
-      .get(`/policies/${fakePolicyId}/client`)
+      .get(`${API_BASE_URL}/policies/${fakePolicyId}/client`)
       .set('Authorization', 'Bearer ' + token);
 
     expect(response).to.have.status(NOT_FOUND_CODE);
@@ -129,7 +130,7 @@ describe('Get the client linked to a policy number', () => {
   it('User is not authenticated', async () => {
     const policy = policies[0];
 
-    const response = await chai.request(server).get(`/policies/${policy.id}/client`);
+    const response = await chai.request(server).get(`${API_BASE_URL}/policies/${policy.id}/client`);
 
     expect(response).to.have.status(UNAUTHORIZED_CODE);
     expect(response.body.message).equal(AUTH_UNAUTHORIZED_MESSAGE);
@@ -142,7 +143,7 @@ describe('Get the client linked to a policy number', () => {
     const body = JSON.stringify({ email });
     const responseLogin = await chai
       .request(server)
-      .post('/auth/login')
+      .post(`${API_BASE_URL}/auth/login`)
       .set('Content-Type', 'application/json')
       .send(body);
 
@@ -152,7 +153,7 @@ describe('Get the client linked to a policy number', () => {
 
     const response = await chai
       .request(server)
-      .get(`/policies/${policy.id}/client`)
+      .get(`${API_BASE_URL}/policies/${policy.id}/client`)
       .set('Authorization', 'Bearer ' + token);
 
     expect(response).to.have.status(FORBIDDEN_CODE);

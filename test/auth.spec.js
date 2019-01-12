@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 const server = require('../app');
 const { CLIENTS_URL } = require('../utils/url.constants');
 const {
+  API_BASE_URL,
   SUCCESS_CODE,
   UNAUTHORIZED_CODE,
   VALIDATION_FAILED_CODE
@@ -66,7 +67,7 @@ describe('Authentication and authorization', () => {
 
         const response = await chai
           .request(server)
-          .post('/auth/login')
+          .post(`${API_BASE_URL}/auth/login`)
           .set('Content-Type', 'application/json')
           .send(body);
 
@@ -89,7 +90,7 @@ describe('Authentication and authorization', () => {
 
         const response = await chai
           .request(server)
-          .post('/auth/login')
+          .post(`${API_BASE_URL}/auth/login`)
           .set('Content-Type', 'application/json')
           .send(body);
 
@@ -106,7 +107,7 @@ describe('Authentication and authorization', () => {
 
         const response = await chai
           .request(server)
-          .post('/auth/login')
+          .post(`${API_BASE_URL}/auth/login`)
           .set('Content-Type', 'application/json')
           .send(body);
 

@@ -1,3 +1,8 @@
+const API_VERSION = 1;
+
+exports.API_VERSION = API_VERSION;
+exports.API_BASE_URL = '/api/v' + API_VERSION;
+
 exports.SUCCESS_CODE = 200;
 exports.UNAUTHORIZED_CODE = 401;
 exports.FORBIDDEN_CODE = 403;

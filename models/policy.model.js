@@ -5,6 +5,14 @@ const { INTERNAL_ERROR_CODE } = require('../utils/api.constants.js');
 const { toLowerCase } = require('../utils/string.helper');
 
 class Policy {
+  constructor(id, amountInsured, email, inceptionDate, installmentPayment, clientId) {
+    this.id = id;
+    this.amountInsured = amountInsured;
+    this.email = email;
+    this.inceptionDate = inceptionDate;
+    this.installmentPayment = installmentPayment;
+    this.clientId = clientId;
+  }
   /**
    * It is used to request to external API all the policies
    *

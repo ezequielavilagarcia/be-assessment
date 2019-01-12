@@ -6,6 +6,7 @@ const MockAdapter = require('axios-mock-adapter');
 const server = require('../app');
 const { CLIENTS_URL, POLICIES_URL } = require('../utils/url.constants');
 const {
+  API_BASE_URL,
   SUCCESS_CODE,
   NOT_FOUND_CODE,
   UNAUTHORIZED_CODE,
@@ -58,7 +59,7 @@ describe('Get client data filtered', () => {
     const body = JSON.stringify({ email });
     const response = await chai
       .request(server)
-      .post('/auth/login')
+      .post(`${API_BASE_URL}/auth/login`)
       .set('Content-Type', 'application/json')
       .send(body);
 
@@ -78,7 +79,7 @@ describe('Get client data filtered', () => {
 
         const response = await chai
           .request(server)
-          .get('/clients/' + client.id)
+          .get(`${API_BASE_URL}/clients/${client.id}`)
           .set('Authorization', 'Bearer ' + token);
 
         expect(response).to.have.status(SUCCESS_CODE);
@@ -92,7 +93,7 @@ describe('Get client data filtered', () => {
         const clientId = '123456-fake';
         const response = await chai
           .request(server)
-          .get('/clients/' + clientId)
+          .get(`${API_BASE_URL}/clients/${clientId}`)
           .set('Authorization', 'Bearer ' + token);
 
         expect(response).to.have.status(NOT_FOUND_CODE);
@@ -104,8 +105,7 @@ describe('Get client data filtered', () => {
       it('Do not add header with authorization header', async () => {
         const client = clients[0];
 
-        const response = await chai.request(server).get('/clients/' + client.id);
-
+        const response = await chai.request(server).get(`${API_BASE_URL}/clients/${client.id}`);
         expect(response).to.have.status(UNAUTHORIZED_CODE);
         expect(response.body.message).equal(AUTH_UNAUTHORIZED_MESSAGE);
         expect(response.body).to.not.have.property('client');
@@ -119,7 +119,7 @@ describe('Get client data filtered', () => {
 
         const response = await chai
           .request(server)
-          .get('/clients/filter/' + client.name)
+          .get(`${API_BASE_URL}/clients/filter/${client.name}`)
           .set('Authorization', 'Bearer ' + token);
 
         expect(response).to.have.status(SUCCESS_CODE);
@@ -133,7 +133,7 @@ describe('Get client data filtered', () => {
 
         const response = await chai
           .request(server)
-          .get('/clients/filter/' + clientName)
+          .get(`${API_BASE_URL}/clients/filter/${clientName}`)
           .set('Authorization', 'Bearer ' + token);
 
         expect(response).to.have.status(SUCCESS_CODE);
@@ -148,7 +148,7 @@ describe('Get client data filtered', () => {
         const clientName = 'Fake Name';
         const response = await chai
           .request(server)
-          .get('/clients/filter/' + clientName)
+          .get(`${API_BASE_URL}/clients/filter/${clientName}`)
           .set('Authorization', 'Bearer ' + token);
 
         expect(response).to.have.status(NOT_FOUND_CODE);
@@ -161,7 +161,9 @@ describe('Get client data filtered', () => {
       it('Do not add header with authorization header', async () => {
         const client = clients[0];
 
-        const response = await chai.request(server).get('/clients/filter/' + client.name);
+        const response = await chai
+          .request(server)
+          .get(`${API_BASE_URL}/clients/filter/${client.name}`);
 
         expect(response).to.have.status(UNAUTHORIZED_CODE);
         expect(response.body.message).equal(AUTH_UNAUTHORIZED_MESSAGE);
@@ -236,7 +238,7 @@ describe('Get the list of policies linked to a client name', () => {
     const body = JSON.stringify({ email });
     const response = await chai
       .request(server)
-      .post('/auth/login')
+      .post(`${API_BASE_URL}/auth/login`)
       .set('Content-Type', 'application/json')
       .send(body);
 
@@ -254,7 +256,7 @@ describe('Get the list of policies linked to a client name', () => {
 
       const response = await chai
         .request(server)
-        .get(`/clients/${client.name}/policies`)
+        .get(`${API_BASE_URL}/clients/${client.name}/policies`)
         .set('Authorization', 'Bearer ' + token);
 
       expect(response).to.have.status(SUCCESS_CODE);
@@ -267,7 +269,7 @@ describe('Get the list of policies linked to a client name', () => {
 
       const response = await chai
         .request(server)
-        .get(`/clients/${client.name}/policies`)
+        .get(`${API_BASE_URL}/clients/${client.name}/policies`)
         .set('Authorization', 'Bearer ' + token);
 
       expect(response).to.have.status(NOT_FOUND_CODE);
@@ -281,7 +283,7 @@ describe('Get the list of policies linked to a client name', () => {
 
       const response = await chai
         .request(server)
-        .get(`/clients/${clientName}/policies`)
+        .get(`${API_BASE_URL}/clients/${clientName}/policies`)
         .set('Authorization', 'Bearer ' + token);
 
       expect(response).to.have.status(SUCCESS_CODE);
@@ -295,7 +297,7 @@ describe('Get the list of policies linked to a client name', () => {
 
     const response = await chai
       .request(server)
-      .get(`/clients/${clientName}/policies`)
+      .get(`${API_BASE_URL}/clients/${clientName}/policies`)
       .set('Authorization', 'Bearer ' + token);
 
     expect(response).to.have.status(NOT_FOUND_CODE);
@@ -306,7 +308,9 @@ describe('Get the list of policies linked to a client name', () => {
     it('User is not authenticated ', async () => {
       const client = clients[0];
 
-      const response = await chai.request(server).get(`/clients/${client.name}/policies`);
+      const response = await chai
+        .request(server)
+        .get(`${API_BASE_URL}/clients/${client.name}/policies`);
 
       expect(response).to.have.status(UNAUTHORIZED_CODE);
       expect(response.body.message).equal(AUTH_UNAUTHORIZED_MESSAGE);
@@ -317,7 +321,7 @@ describe('Get the list of policies linked to a client name', () => {
       const body = JSON.stringify({ email });
       const loginResponse = await chai
         .request(server)
-        .post('/auth/login')
+        .post(`${API_BASE_URL}/auth/login`)
         .set('Content-Type', 'application/json')
         .send(body);
 
@@ -327,7 +331,7 @@ describe('Get the list of policies linked to a client name', () => {
 
       const response = await chai
         .request(server)
-        .get(`/clients/${client.name}/policies`)
+        .get(`${API_BASE_URL}/clients/${client.name}/policies`)
         .set('Authorization', 'Bearer ' + token);
 
       expect(response).to.have.status(FORBIDDEN_CODE);

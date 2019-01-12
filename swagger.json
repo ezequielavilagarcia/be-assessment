@@ -245,7 +245,6 @@
         "responses": {
           "200": {
             "description": "Client fetched",
-
             "schema": {
               "type": "object",
               "properties": {

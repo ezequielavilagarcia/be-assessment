@@ -8,17 +8,22 @@ const allowCORS = require('./middlewares/allow-cors');
 const errorHandler = require('./middlewares/error-handler');
 
 const { clientRoutes, policyRoutes, authRoutes } = require('./routes');
+const { API_BASE_URL } = require('./utils/api.constants');
 
 const app = express();
 
-app.use(bodyParser.json());
-app.use(allowCORS());
+const api = express.Router();
 
-app.use('/auth', authRoutes);
-app.use('/clients', clientRoutes);
-app.use('/policies', policyRoutes);
-app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
-app.use(errorHandler());
+app.use(API_BASE_URL, api);
+
+api.use(bodyParser.json());
+api.use(allowCORS());
+
+api.use('/auth', authRoutes);
+api.use('/clients', clientRoutes);
+api.use('/policies', policyRoutes);
+api.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
+api.use(errorHandler());
 
 app.listen(process.env.PORT);
 
