@@ -8,3 +8,4 @@ exports.POLICY_CLIENT_NOT_FOUNDED_MESSAGE = 'Policy does not have any client yet
 
 exports.AUTH_UNAUTHORIZED_MESSAGE = 'Wrong email';
 exports.AUTH_LOGIN_SUCCESS_MESSAGE = 'Login successfully';
+exports.AUTH_FORBIDDEN_MESSAGE = 'Not authenticated';

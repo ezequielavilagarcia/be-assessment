@@ -5,23 +5,31 @@ const MockAdapter = require('axios-mock-adapter');
 
 const server = require('../app');
 const { CLIENTS_URL, POLICIES_URL } = require('../utils/url.constants');
-const { SUCCESS_CODE, NOT_FOUND_CODE } = require('../utils/api.constants');
+const {
+  SUCCESS_CODE,
+  NOT_FOUND_CODE,
+  UNAUTHORIZED_CODE,
+  FORBIDDEN_CODE
+} = require('../utils/api.constants');
 const {
   CLIENT_FOUNDED_MESSAGE,
   CLIENT_NOT_FOUNDED_MESSAGE,
   CLIENT_POLICIES_FOUNDED_MESSAGE,
-  CLIENT_POLICIES_NOT_FOUNDED_MESSAGE
+  CLIENT_POLICIES_NOT_FOUNDED_MESSAGE,
+  AUTH_UNAUTHORIZED_MESSAGE,
+  AUTH_FORBIDDEN_MESSAGE
 } = require('../utils/messages.constants');
 
 const expect = chai.expect;
 describe('Get client data filtered', () => {
   let axiosMocked;
   let clients;
+  let token;
   before(() => {
     chai.use(chaiHttp);
     axiosMocked = new MockAdapter(axios);
   });
-  beforeEach(() => {
+  beforeEach(async () => {
     clients = [
       {
         id: 'a0ece5db-cd14-4f21-812f-966633e7be86',
@@ -45,6 +53,16 @@ describe('Get client data filtered', () => {
     axiosMocked.onGet(CLIENTS_URL).reply(SUCCESS_CODE, {
       clients
     });
+
+    const email = clients[1].email;
+    const body = JSON.stringify({ email });
+    const response = await chai
+      .request(server)
+      .post('/auth/login')
+      .set('Content-Type', 'application/json')
+      .send(body);
+
+    token = response.body.token;
   });
   afterEach(() => {
     axiosMocked.reset();
@@ -58,7 +76,10 @@ describe('Get client data filtered', () => {
       it('is succesful', async () => {
         const client = clients[0];
 
-        const response = await chai.request(server).get('/clients/' + client.id);
+        const response = await chai
+          .request(server)
+          .get('/clients/' + client.id)
+          .set('Authorization', 'Bearer ' + token);
 
         expect(response).to.have.status(SUCCESS_CODE);
         expect(response.body.message).equal(CLIENT_FOUNDED_MESSAGE);
@@ -69,17 +90,26 @@ describe('Get client data filtered', () => {
     describe('client does not exists', () => {
       it('return not found code and not found message', async () => {
         const clientId = '123456-fake';
-        const response = await chai.request(server).get('/clients/' + clientId);
+        const response = await chai
+          .request(server)
+          .get('/clients/' + clientId)
+          .set('Authorization', 'Bearer ' + token);
 
         expect(response).to.have.status(NOT_FOUND_CODE);
         expect(response.body).to.not.have.property('client');
         expect(response.body.message).equal(CLIENT_NOT_FOUNDED_MESSAGE);
       });
     });
-
     describe('user is not authenticated', () => {
-      it('is not succesful');
-      it('tells user to authenticate');
+      it('Do not add header with authorization header', async () => {
+        const client = clients[0];
+
+        const response = await chai.request(server).get('/clients/' + client.id);
+
+        expect(response).to.have.status(UNAUTHORIZED_CODE);
+        expect(response.body.message).equal(AUTH_UNAUTHORIZED_MESSAGE);
+        expect(response.body).to.not.have.property('client');
+      });
     });
   });
   describe('By client name', () => {
@@ -87,7 +117,10 @@ describe('Get client data filtered', () => {
       it('is succesful', async () => {
         const client = clients[1];
 
-        const response = await chai.request(server).get('/clients/filter/' + client.name);
+        const response = await chai
+          .request(server)
+          .get('/clients/filter/' + client.name)
+          .set('Authorization', 'Bearer ' + token);
 
         expect(response).to.have.status(SUCCESS_CODE);
         expect(response.body.message).equal(CLIENT_FOUNDED_MESSAGE);
@@ -98,7 +131,10 @@ describe('Get client data filtered', () => {
         const client = clients[1];
         const clientName = client.name.replace(client.name, 'DaNiEl');
 
-        const response = await chai.request(server).get('/clients/filter/' + clientName);
+        const response = await chai
+          .request(server)
+          .get('/clients/filter/' + clientName)
+          .set('Authorization', 'Bearer ' + token);
 
         expect(response).to.have.status(SUCCESS_CODE);
         expect(response.body.message).equal(CLIENT_FOUNDED_MESSAGE);
@@ -110,7 +146,11 @@ describe('Get client data filtered', () => {
     describe('client does not exists', () => {
       it('return not found code and not found message', async () => {
         const clientName = 'Fake Name';
-        const response = await chai.request(server).get('/clients/filter/' + clientName);
+        const response = await chai
+          .request(server)
+          .get('/clients/filter/' + clientName)
+          .set('Authorization', 'Bearer ' + token);
+
         expect(response).to.have.status(NOT_FOUND_CODE);
         expect(response.body).to.not.have.property('client');
         expect(response.body.message).equal(CLIENT_NOT_FOUNDED_MESSAGE);
@@ -118,19 +158,27 @@ describe('Get client data filtered', () => {
     });
 
     describe('user is not authenticated', () => {
-      it('is not succesful');
-      it('tells user to authenticate');
+      it('Do not add header with authorization header', async () => {
+        const client = clients[0];
+
+        const response = await chai.request(server).get('/clients/filter/' + client.name);
+
+        expect(response).to.have.status(UNAUTHORIZED_CODE);
+        expect(response.body.message).equal(AUTH_UNAUTHORIZED_MESSAGE);
+        expect(response.body).to.not.have.property('client');
+      });
     });
   });
 });
 describe('Get the list of policies linked to a client name', () => {
   let axiosMocked;
   let clients;
+  let token;
   before(() => {
     chai.use(chaiHttp);
     axiosMocked = new MockAdapter(axios);
   });
-  beforeEach(() => {
+  beforeEach(async () => {
     clients = [
       {
         id: 'a0ece5db-cd14-4f21-812f-966633e7be86',
@@ -183,6 +231,16 @@ describe('Get the list of policies linked to a client name', () => {
     axiosMocked.onGet(POLICIES_URL).reply(SUCCESS_CODE, {
       policies
     });
+
+    const email = clients[0].email;
+    const body = JSON.stringify({ email });
+    const response = await chai
+      .request(server)
+      .post('/auth/login')
+      .set('Content-Type', 'application/json')
+      .send(body);
+
+    token = response.body.token;
   });
   afterEach(() => {
     axiosMocked.reset();
@@ -194,7 +252,10 @@ describe('Get the list of policies linked to a client name', () => {
     it('Client has policies', async () => {
       const client = clients[0];
 
-      const response = await chai.request(server).get(`/clients/${client.name}/policies`);
+      const response = await chai
+        .request(server)
+        .get(`/clients/${client.name}/policies`)
+        .set('Authorization', 'Bearer ' + token);
 
       expect(response).to.have.status(SUCCESS_CODE);
       expect(response.body.message).equal(CLIENT_POLICIES_FOUNDED_MESSAGE);
@@ -204,7 +265,10 @@ describe('Get the list of policies linked to a client name', () => {
     it('Client does not have policies', async () => {
       const client = clients[1];
 
-      const response = await chai.request(server).get(`/clients/${client.name}/policies`);
+      const response = await chai
+        .request(server)
+        .get(`/clients/${client.name}/policies`)
+        .set('Authorization', 'Bearer ' + token);
 
       expect(response).to.have.status(NOT_FOUND_CODE);
       expect(response.body.message).equal(CLIENT_POLICIES_NOT_FOUNDED_MESSAGE);
@@ -215,7 +279,10 @@ describe('Get the list of policies linked to a client name', () => {
       const client = clients[0];
       const clientName = client.name.replace(client.name, 'BrItNeY');
 
-      const response = await chai.request(server).get(`/clients/${clientName}/policies`);
+      const response = await chai
+        .request(server)
+        .get(`/clients/${clientName}/policies`)
+        .set('Authorization', 'Bearer ' + token);
 
       expect(response).to.have.status(SUCCESS_CODE);
       expect(response.body.message).equal(CLIENT_POLICIES_FOUNDED_MESSAGE);
@@ -226,11 +293,46 @@ describe('Get the list of policies linked to a client name', () => {
   it('Client does not exists', async () => {
     const clientName = 'fakeName';
 
-    const response = await chai.request(server).get(`/clients/${clientName}/policies`);
+    const response = await chai
+      .request(server)
+      .get(`/clients/${clientName}/policies`)
+      .set('Authorization', 'Bearer ' + token);
 
     expect(response).to.have.status(NOT_FOUND_CODE);
     expect(response.body.message).equal(CLIENT_NOT_FOUNDED_MESSAGE);
     expect(response.body).to.not.have.property('client');
   });
-  it('Client is not authenticated');
+  describe('Security', () => {
+    it('User is not authenticated ', async () => {
+      const client = clients[0];
+
+      const response = await chai.request(server).get(`/clients/${client.name}/policies`);
+
+      expect(response).to.have.status(UNAUTHORIZED_CODE);
+      expect(response.body.message).equal(AUTH_UNAUTHORIZED_MESSAGE);
+      expect(response.body).to.not.have.property('client');
+    });
+    it('User does not have role of admin ', async () => {
+      const email = clients[1].email;
+      const body = JSON.stringify({ email });
+      const loginResponse = await chai
+        .request(server)
+        .post('/auth/login')
+        .set('Content-Type', 'application/json')
+        .send(body);
+
+      token = loginResponse.body.token;
+
+      const client = clients[0];
+
+      const response = await chai
+        .request(server)
+        .get(`/clients/${client.name}/policies`)
+        .set('Authorization', 'Bearer ' + token);
+
+      expect(response).to.have.status(FORBIDDEN_CODE);
+      expect(response.body.message).equal(AUTH_FORBIDDEN_MESSAGE);
+      expect(response.body).to.not.have.property('client');
+    });
+  });
 });

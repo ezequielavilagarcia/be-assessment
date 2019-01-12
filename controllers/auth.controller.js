@@ -8,6 +8,13 @@ const {
 } = require('../utils/messages.constants');
 const { expiresIn } = require('../utils/token.constants');
 
+/**
+ * Login by any client email without password and this return a token to use in the app.
+ *
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
 exports.login = async (req, res, next) => {
   const email = req.body.email;
   try {

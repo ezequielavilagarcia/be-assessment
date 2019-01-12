@@ -54,7 +54,7 @@ describe('Authentication and authorization', () => {
   });
 
   describe('Login', () => {
-    describe('Login success', () => {
+    describe('User exists', () => {
       it('Should return a token with the user role and the user', async () => {
         const email = clients[0].email;
         const body = JSON.stringify({ email });
@@ -77,7 +77,7 @@ describe('Authentication and authorization', () => {
         expect(decodedToken).to.have.property('role');
       });
     });
-    describe('Login failed', () => {
+    describe('User does not exists', () => {
       it('Should return an specific message with not found api code', async () => {
         const email = 'fakeEmail@email.com';
         const body = JSON.stringify({ email });

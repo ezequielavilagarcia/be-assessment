@@ -5,10 +5,17 @@ const MockAdapter = require('axios-mock-adapter');
 
 const server = require('../app');
 const { CLIENTS_URL, POLICIES_URL } = require('../utils/url.constants');
-const { SUCCESS_CODE, NOT_FOUND_CODE } = require('../utils/api.constants');
+const {
+  SUCCESS_CODE,
+  NOT_FOUND_CODE,
+  UNAUTHORIZED_CODE,
+  FORBIDDEN_CODE
+} = require('../utils/api.constants');
 const {
   CLIENT_FOUNDED_MESSAGE,
-  POLICY_NOT_FOUNDED_MESSAGE
+  POLICY_NOT_FOUNDED_MESSAGE,
+  AUTH_UNAUTHORIZED_MESSAGE,
+  AUTH_FORBIDDEN_MESSAGE
 } = require('../utils/messages.constants');
 
 const expect = chai.expect;
@@ -16,11 +23,12 @@ const expect = chai.expect;
 describe('Get the client linked to a policy number', () => {
   let axiosMocked;
   let clients;
+  let token;
   before(() => {
     chai.use(chaiHttp);
     axiosMocked = new MockAdapter(axios);
   });
-  beforeEach(() => {
+  beforeEach(async () => {
     clients = [
       {
         id: 'a0ece5db-cd14-4f21-812f-966633e7be86',
@@ -73,6 +81,16 @@ describe('Get the client linked to a policy number', () => {
     axiosMocked.onGet(POLICIES_URL).reply(SUCCESS_CODE, {
       policies
     });
+
+    const email = clients[0].email;
+    const body = JSON.stringify({ email });
+    const response = await chai
+      .request(server)
+      .post('/auth/login')
+      .set('Content-Type', 'application/json')
+      .send(body);
+
+    token = response.body.token;
   });
   afterEach(() => {
     axiosMocked.reset();
@@ -84,7 +102,10 @@ describe('Get the client linked to a policy number', () => {
   it('Policy exists with a client linked', async () => {
     const policy = policies[0];
 
-    const response = await chai.request(server).get(`/policies/${policy.id}/client`);
+    const response = await chai
+      .request(server)
+      .get(`/policies/${policy.id}/client`)
+      .set('Authorization', 'Bearer ' + token);
 
     expect(response.body.message).equal(CLIENT_FOUNDED_MESSAGE);
     expect(response).to.have.status(SUCCESS_CODE);
@@ -95,12 +116,48 @@ describe('Get the client linked to a policy number', () => {
   it('Policy does not exists', async () => {
     const fakePolicyId = 'fakeId';
 
-    const response = await chai.request(server).get(`/policies/${fakePolicyId}/client`);
+    const response = await chai
+      .request(server)
+      .get(`/policies/${fakePolicyId}/client`)
+      .set('Authorization', 'Bearer ' + token);
 
     expect(response).to.have.status(NOT_FOUND_CODE);
     expect(response.body.message).equal(POLICY_NOT_FOUNDED_MESSAGE);
     expect(response.body).to.not.have.property('client');
     expect(response.body).to.not.have.property('policy');
   });
-  it('Client is not authenticated');
+  it('User is not authenticated', async () => {
+    const policy = policies[0];
+
+    const response = await chai.request(server).get(`/policies/${policy.id}/client`);
+
+    expect(response).to.have.status(UNAUTHORIZED_CODE);
+    expect(response.body.message).equal(AUTH_UNAUTHORIZED_MESSAGE);
+    expect(response.body).to.not.have.property('client');
+    expect(response.body).to.not.have.property('policy');
+  });
+
+  it('User do not have role of admin', async () => {
+    const email = clients[1].email;
+    const body = JSON.stringify({ email });
+    const responseLogin = await chai
+      .request(server)
+      .post('/auth/login')
+      .set('Content-Type', 'application/json')
+      .send(body);
+
+    token = responseLogin.body.token;
+
+    const policy = policies[0];
+
+    const response = await chai
+      .request(server)
+      .get(`/policies/${policy.id}/client`)
+      .set('Authorization', 'Bearer ' + token);
+
+    expect(response).to.have.status(FORBIDDEN_CODE);
+    expect(response.body.message).equal(AUTH_FORBIDDEN_MESSAGE);
+    expect(response.body).to.not.have.property('client');
+    expect(response.body).to.not.have.property('policy');
+  });
 });
