@@ -1,0 +1,436 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "This is a backend assessment developed with Express to an insurance company to manage some information about insurance policies and company clients. To do that, I should use two services that provide all the data needed [ http://www.mocky.io/v2/5808862710000087232b75ac ] (List of company clients) and [ http://www.mocky.io/v2/580891a4100000e8242b75c5 ] (Company policies).\n\n First you need to login to the app follow the auth/login endpoint documentation to know how to do it.\n\n Some examples of users roles to test the API: \n\n`britneyblankenship@quotezart.com` Admin \n\n`barnettblankenship@quotezart.com` User",
+    "version": "1.0.0",
+    "title": "Swagger Insurance Policies",
+    "contact": {
+      "email": "ezequielavilagarcia@gmail.com"
+    }
+  },
+  "host": "",
+  "basePath": "api/v1",
+  "tags": [
+    {
+      "name": "auth",
+      "description": "Login"
+    },
+    {
+      "name": "clients",
+      "description": "Everything about company clients",
+      "externalDocs": {
+        "description": "Find out more",
+        "url": "http://swagger.io"
+      }
+    },
+    {
+      "name": "policies",
+      "description": "Everything about insurance policies"
+    }
+  ],
+  "schemes": ["http"],
+  "paths": {
+    "/clients/{clientId}": {
+      "get": {
+        "tags": ["clients"],
+        "summary": "Get client data filtered by user id",
+        "description": "Returns a single Client. Can be accessed by users with role 'user' and 'admin'",
+        "operationId": "getClientById",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "clientId",
+            "in": "path",
+            "description": "ID of client to return",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client fetched",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "example": "client fetched.",
+                  "type": "string"
+                },
+                "client": {
+                  "$ref": "#/definitions/Client"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Client not authenticated",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "example": "Not authenticated!",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Could not find client",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "example": "Could not find client",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/clients/filter/{clientName}": {
+      "get": {
+        "tags": ["clients"],
+        "summary": "Get client data filtered by user name",
+        "description": "Returns a single Client. Can be accessed by users with role 'user' and 'admin'",
+        "operationId": "getClientByName",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "clientName",
+            "in": "path",
+            "description": "Name of client to return",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client fetched",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "example": "Client fetched",
+                  "type": "string"
+                },
+                "client": {
+                  "$ref": "#/definitions/Client"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Client not authenticated",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "example": "Not authenticated!",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Could not find client",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "example": "Could not find client",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/clients/{clientName}/policies": {
+      "get": {
+        "tags": ["clients"],
+        "summary": "Get the list of policies linked to a user name",
+        "description": "Returns a single Client with a list of Policies. Can be accessed by users with role 'admin'",
+        "operationId": "getClientPolicies",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "clientName",
+            "in": "path",
+            "description": "Name of client to return",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client policies fetched",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "example": "Client policies fetched",
+                  "type": "string"
+                },
+                "client": {
+                  "$ref": "#/definitions/Client"
+                },
+                "policies": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Policy"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Client not authenticated",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "example": "Not authenticated!",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Client not authorized",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "example": "Not authorized!",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Could not find client",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "example": "Could not find client",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/policies/{policyId}/client": {
+      "get": {
+        "tags": ["policies"],
+        "summary": "Get the user linked to a policy number",
+        "description": "Returns a single Policy with a single Client. Can be accessed by users with role 'admin'",
+        "operationId": "getPetById",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "petId",
+            "in": "path",
+            "description": "ID of pet to return",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client fetched",
+
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Client fetched"
+                },
+                "policy": {
+                  "$ref": "#/definitions/Policy"
+                },
+                "client": {
+                  "$ref": "#/definitions/Client"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Client not authenticated",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "example": "Not authenticated!",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Client not authorized",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "example": "Not authorized!",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Could not find client",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "example": "Could not find client",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Logs user into the system",
+        "description": "",
+        "operationId": "loginUser",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "email",
+            "description": "The user email for login",
+            "required": true,
+            "type": "string",
+            "example": "britneyblankenship@quotezart.com"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "example": "Login successfully",
+                  "type": "string"
+                },
+                "token": {
+                  "example": "validTokenLongLongLong",
+                  "type": "string"
+                },
+                "user": {
+                  "$ref": "#/definitions/Client"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Valid email but does not exists",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "example": "Wrong email!",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Enter invalid email",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "example": "Validation failed",
+                  "type": "string"
+                },
+                "data": {
+                  "type": "array",
+                  "example": [
+                    {
+                      "location": "body",
+                      "param": "email",
+                      "value": "1234",
+                      "msg": "Please enter a valid email."
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Client": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "a0ece5db-cd14-4f21-812f-966633e7be86"
+        },
+        "name": {
+          "type": "string",
+          "example": "Britney"
+        },
+        "email": {
+          "type": "string",
+          "example": "britneyblankenship@quotezart.com"
+        },
+        "role": {
+          "type": "string",
+          "example": "admin"
+        }
+      }
+    },
+    "Policy": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "7b624ed3-00d5-4c1b-9ab8-c265067ef58b"
+        },
+        "amountInsured": {
+          "type": "float",
+          "example": 399.89
+        },
+        "email": {
+          "type": "string",
+          "example": "inesblankenship@quotezart.com"
+        },
+        "inceptionDate": {
+          "type": "date",
+          "example": "2015-07-06T06:55:49Z"
+        },
+        "installmentPayment": {
+          "type": "boolean",
+          "example": true
+        },
+        "clientId": {
+          "type": "string",
+          "example": "a0ece5db-cd14-4f21-812f-966633e7be86"
+        }
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "Read the requirements",
+    "url": "https://docs.google.com/document/d/1Xtf1_9pc-N30fe1_U39POn8gTyw2oF01kPg7M1YlnjU/edit?usp=sharing"
+  }
+}

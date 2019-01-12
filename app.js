@@ -1,5 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const swaggerUI = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
 require('dotenv').config();
 
 const allowCORS = require('./middlewares/allow-cors');
@@ -15,7 +17,7 @@ app.use(allowCORS());
 app.use('/auth', authRoutes);
 app.use('/clients', clientRoutes);
 app.use('/policies', policyRoutes);
-
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 app.use(errorHandler());
 
 app.listen(process.env.PORT);
