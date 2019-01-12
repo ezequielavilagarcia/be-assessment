@@ -1,10 +1,17 @@
 const jwt = require('jsonwebtoken');
+const { validationResult } = require('express-validator/check');
 
 const { Client } = require('../models');
-const { UNAUTHORIZED_CODE, SUCCESS_CODE, INTERNAL_ERROR_CODE } = require('../utils/api.constants');
 const {
-  AUTH_UNAUTHORIZED_MESSAGE,
-  AUTH_LOGIN_SUCCESS_MESSAGE
+  UNAUTHORIZED_CODE,
+  SUCCESS_CODE,
+  INTERNAL_ERROR_CODE,
+  VALIDATION_FAILED_CODE
+} = require('../utils/api.constants');
+const {
+  AUTH_USER_NOT_EXISTS_MESSAGE,
+  AUTH_LOGIN_SUCCESS_MESSAGE,
+  AUTH_VALIDATION_FAILED_MESSAGE
 } = require('../utils/messages.constants');
 const { expiresIn } = require('../utils/token.constants');
 
@@ -16,11 +23,21 @@ const { expiresIn } = require('../utils/token.constants');
  * @param {*} next
  */
 exports.login = async (req, res, next) => {
-  const email = req.body.email;
   try {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      const error = new Error(AUTH_VALIDATION_FAILED_MESSAGE);
+      error.statusCode = VALIDATION_FAILED_CODE;
+      error.data = errors.array();
+      throw error;
+    }
+
+    const email = req.body.email;
+
     const user = await Client.find({ email });
     if (user == null) {
-      const error = new Error(AUTH_UNAUTHORIZED_MESSAGE);
+      const error = new Error(AUTH_USER_NOT_EXISTS_MESSAGE);
 
       error.statusCode = UNAUTHORIZED_CODE;
 

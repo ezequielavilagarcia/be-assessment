@@ -6,10 +6,15 @@ const jwt = require('jsonwebtoken');
 
 const server = require('../app');
 const { CLIENTS_URL } = require('../utils/url.constants');
-const { SUCCESS_CODE, UNAUTHORIZED_CODE } = require('../utils/api.constants');
+const {
+  SUCCESS_CODE,
+  UNAUTHORIZED_CODE,
+  VALIDATION_FAILED_CODE
+} = require('../utils/api.constants');
 const {
   AUTH_LOGIN_SUCCESS_MESSAGE,
-  AUTH_UNAUTHORIZED_MESSAGE
+  AUTH_USER_NOT_EXISTS_MESSAGE,
+  AUTH_VALIDATION_FAILED_MESSAGE
 } = require('../utils/messages.constants');
 
 const expect = chai.expect;
@@ -89,7 +94,24 @@ describe('Authentication and authorization', () => {
           .send(body);
 
         expect(response).to.have.status(UNAUTHORIZED_CODE);
-        expect(response.body.message).equal(AUTH_UNAUTHORIZED_MESSAGE);
+        expect(response.body.message).equal(AUTH_USER_NOT_EXISTS_MESSAGE);
+        expect(response.body).to.not.have.property('user');
+        expect(response.body).to.not.have.property('token');
+      });
+    });
+    describe('Invalid email', () => {
+      it('Should return an specific message with validation failed api code', async () => {
+        const email = 'wrongemail';
+        const body = JSON.stringify({ email });
+
+        const response = await chai
+          .request(server)
+          .post('/auth/login')
+          .set('Content-Type', 'application/json')
+          .send(body);
+
+        expect(response).to.have.status(VALIDATION_FAILED_CODE);
+        expect(response.body.message).equal(AUTH_VALIDATION_FAILED_MESSAGE);
         expect(response.body).to.not.have.property('user');
         expect(response.body).to.not.have.property('token');
       });
