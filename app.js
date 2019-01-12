@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const swaggerUI = require('swagger-ui-express');
 const swaggerDocument = require('./swagger.json');
 const helmet = require('helmet');
+const compression = require('compression');
 
 require('dotenv').config();
 
@@ -21,6 +22,7 @@ app.use(API_BASE_URL, api);
 api.use(bodyParser.json());
 api.use(allowCORS());
 api.use(helmet());
+app.use(compression());
 
 api.use('/auth', authRoutes);
 api.use('/clients', clientRoutes);
