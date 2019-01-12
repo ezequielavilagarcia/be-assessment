@@ -137,7 +137,7 @@ describe('Get the client linked to a policy number', () => {
     expect(response.body).to.not.have.property('policy');
   });
 
-  it('User do not have role of admin', async () => {
+  it('User does not have role of admin', async () => {
     const email = clients[1].email;
     const body = JSON.stringify({ email });
     const responseLogin = await chai
