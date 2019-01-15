@@ -35,6 +35,26 @@ To test the app I used mocha and chai. Up to now there are 20 integration test w
 
 To run tests just run npm test
 
+# Endpoints examples
+(Login - Authentication & Authorization)
+POST: /api/v1/login  (Login to the app)
+
+(Get client data filtered by user id)
+GET /clients/{clientId}
+http://localhost:3000/api/v1/clients/a0ece5db-cd14-4f21-812f-966633e7be86
+
+(Get client data filtered by user name)
+GET /clients/filter/{clientName}
+http://localhost:3000/api/v1/clients/filter/Britney
+
+(Get the list of policies linked to a user name)
+GET /clients/{clientName}/policies
+http://localhost:3000/api/v1/clients/Britney/policies
+
+(Get the user linked to a policy number)
+GET /policies/{policyId}/client
+http://localhost:3000/api/v1/policies/7b624ed3-00d5-4c1b-9ab8-c265067ef58b/client
+
 # See full API documentation with Swagger
 
 I install swagger to let you know the full information about the endpoints, models and api responses so clone the repository and open in your browser:
