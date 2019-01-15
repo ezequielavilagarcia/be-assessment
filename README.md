@@ -35,6 +35,10 @@ To test the app I used mocha and chai. Up to now there are 20 integration test w
 
 To run tests just run npm test
 
+# Requirements
+Here are the api requirements
+https://docs.google.com/document/d/1Xtf1_9pc-N30fe1_U39POn8gTyw2oF01kPg7M1YlnjU/edit?usp=sharing
+
 # Endpoints examples
 (Login - Authentication & Authorization)  
 POST: /api/v1/login   
